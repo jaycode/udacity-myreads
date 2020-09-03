@@ -7,7 +7,8 @@ import { throttle, debounce } from 'throttle-debounce';
 
 class Search extends React.Component {
   state = {
-    books: []
+    books: [],
+    lastQuery: ''
   }
 
   search(query, maxResult = 20) {
@@ -25,16 +26,20 @@ class Search extends React.Component {
               books[i].shelf = shelf
             }
           }
-          this.setState({books: books})
+          this.setState({books: books, lastQuery: query})
         })
     }
     else {
-      this.setState({books: []})
+      this.setState({books: [], lastQuery: query})
     }
   }
 
+  noBooksFound() {
+    return (this.state.lastQuery != '' && this.state.books.length == 0)
+  }
+
   componentDidMount() {
-    this.search('')
+    // this.search('')
   }
 
   onChange(e) {
@@ -66,6 +71,8 @@ class Search extends React.Component {
           </div>
         </div>
         <div className="search-books-results">
+          {(this.noBooksFound()) ? "No books found" : 
+            (this.state.books.length == 0 ? "Enter a query to begin the search e.g. 'Android', 'Artificial Intelligence'" : "")} 
           <ol className="books-grid">
             {this.state.books.map((book) => (
               <li key={book.id}>

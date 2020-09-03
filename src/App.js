@@ -30,9 +30,22 @@ class BooksApp extends React.Component {
   addNewBook(to, book, e) {
     const bookExists = this.state.books.filter(b => b.id === book.id).length === 0 ? false : true
     if (!bookExists) {
-      console.log("add new book")
       book.shelf = to
-      this.setState((oldstate) => ({books: oldstate.books.concat(book)}))
+      BooksAPI.update(book, to)
+        .then((function(response) {
+          let newbooks = this.state.books.concat(book).map(b => {
+            b.shelf = ''
+            return b
+          })
+          for (const k in response) {
+            for (const id of response[k]) {
+              newbooks[newbooks.findIndex(b => b.id === id)].shelf = k
+            }
+          }
+          
+          this.setState({books: newbooks})
+        }).bind(this))
+
     }
     else {
       this.moveBook(to, book, e)
